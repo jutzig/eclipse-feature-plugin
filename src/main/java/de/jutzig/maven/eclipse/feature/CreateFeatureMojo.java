@@ -193,6 +193,9 @@ public class CreateFeatureMojo
         {
             throw new MojoExecutionException("failed to generate feature.xml", e);
         }
+        catch (RuntimeException e) {
+            getLog().error(e);
+        }
 
     }
 
@@ -218,6 +221,11 @@ public class CreateFeatureMojo
     {
         JarFile jar = new JarFile(artifact.getFile());
         String name = jar.getManifest().getMainAttributes().getValue("Bundle-SymbolicName");
+        if(name==null)
+        {
+            getLog().warn(artifact+" does not have a Bundle-SymbolicName. Defaulting to artifact name");
+            name = artifact.getGroupId()+"."+artifact.getArtifactId();
+        }
         //get rid of attributes
         name = name.replaceAll(";.*", "");
         jar.close();
@@ -228,6 +236,11 @@ public class CreateFeatureMojo
     {
         JarFile jar = new JarFile(artifact.getFile());
         String version = jar.getManifest().getMainAttributes().getValue("Bundle-Version");
+        if(version==null)
+        {
+            getLog().warn(artifact+" does not have a Bundle-Version. Defaulting to artifact version");
+            version = artifact.getVersion();
+        }
         jar.close();
         return version;
     }
