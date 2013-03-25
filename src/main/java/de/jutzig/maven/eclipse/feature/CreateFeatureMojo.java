@@ -320,7 +320,7 @@ public class CreateFeatureMojo
     {
         TransformerFactory tFactory = TransformerFactory.newInstance();
         Transformer transformer = tFactory.newTransformer();
-
+        outputDir.mkdirs();
         DOMSource source = new DOMSource(doc);
         StreamResult result = new StreamResult(new File(outputDir,"feature.xml"));
         transformer.setOutputProperty(OutputKeys.INDENT, "yes");
