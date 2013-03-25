@@ -338,7 +338,7 @@ public class CreateFeatureMojo
         doc.appendChild(feature);
         feature.setAttribute("id", id);
         feature.setAttribute("label", featureName);
-        feature.setAttribute("version", version);
+        feature.setAttribute("version", version.replace("-", "."));
         feature.setAttribute("provider-name", provider);
 
         if(url!=null || description!=null)
