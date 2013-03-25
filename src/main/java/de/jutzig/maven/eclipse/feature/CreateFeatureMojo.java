@@ -10,6 +10,8 @@ package de.jutzig.maven.eclipse.feature;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.jar.JarFile;
 
@@ -145,6 +147,17 @@ public class CreateFeatureMojo
      */
     @Parameter(defaultValue="${project.build.directory}",required=true)
     private File outputDir;
+
+    /**
+     * Comma-separated list of groupId:artifactId entries, which should
+     * be used to exclude artifacts from deletion/refresh.
+     */
+    @Parameter
+    private String exclude;
+
+
+    private List<String> splittedExclude;
+
     /**
      * POM
      */
@@ -161,11 +174,14 @@ public class CreateFeatureMojo
     {
         try
         {
+            computeExcludes();
             writeHeader();
 
             List<Dependency> dependencies = project.getDependencies();
             for (Dependency dependency : dependencies)
             {
+                if(ignoreArtifact(dependency))
+                    continue;
                 org.sonatype.aether.graph.Dependency dep2 = RepositoryUtils.toDependency(dependency,
                                                                                          repoSession.getArtifactTypeRegistry());
                 DependencyNode node = new DefaultDependencyNode(dep2);
@@ -197,6 +213,47 @@ public class CreateFeatureMojo
             getLog().error(e);
         }
 
+    }
+
+
+    private void computeExcludes()
+    {
+        if(exclude!=null)
+            splittedExclude = Arrays.asList(exclude.split(",(\\s)+"));
+        else
+            splittedExclude = Collections.emptyList();
+
+    }
+
+
+    private boolean ignoreArtifact(Dependency dependency)
+    {
+        if("test".equals(dependency.getScope()))
+            return true;
+        if("system".equals(dependency.getScope()))
+            return true;
+        if("runtime".equals(dependency.getScope()))
+            return true;
+        return isExcluded(dependency);
+    }
+
+
+    private boolean isExcluded(Dependency dependency)
+    {
+        String name = computeName(dependency);
+        if(splittedExclude.contains(name))
+        {
+            getLog().debug("Excluding "+dependency);
+            return true;
+        }
+        return false;
+    }
+
+
+    private String computeName(Dependency dependency)
+    {
+        String name = dependency.getGroupId() + ":" + dependency.getArtifactId();
+        return name;
     }
 
 
