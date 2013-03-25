@@ -27,6 +27,8 @@ import javax.xml.transform.stream.StreamResult;
 
 import org.apache.maven.RepositoryUtils;
 import org.apache.maven.model.Dependency;
+import org.apache.maven.model.InputLocationTracker;
+import org.apache.maven.model.Resource;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
@@ -192,6 +194,7 @@ public class CreateFeatureMojo
             }
 
             serializeOutput();
+            addResource();
         }
         catch (ParserConfigurationException e)
         {
@@ -212,6 +215,16 @@ public class CreateFeatureMojo
         catch (RuntimeException e) {
             getLog().error(e);
         }
+
+    }
+
+
+    private void addResource()
+    {
+        Resource resource = new Resource();
+        resource.addInclude("feature.xml");
+        resource.setDirectory(outputDir.getPath());
+        project.addResource(resource);
 
     }
 
