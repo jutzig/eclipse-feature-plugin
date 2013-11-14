@@ -1,10 +1,4 @@
-/*
- * CreateFeatureMojo.java
- *
- * created at 15.03.2013 by utzig <YOURMAILADDRESS>
- *
- * Copyright (c) SEEBURGER AG, Germany. All Rights Reserved.
- */
+
 package de.jutzig.maven.eclipse.feature;
 
 
